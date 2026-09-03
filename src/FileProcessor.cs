@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using JNukeCrypt.Blowfish;
 
 namespace JNukeCrypt;
 
@@ -14,6 +15,11 @@ internal enum CryptoAction
 /// <summary>
 /// Cuida da leitura, transformação e gravação atômica dos arquivos, além de
 /// decidir se o arquivo deve ser encryptado ou decryptado.
+///
+/// Esquema: Blowfish (formato Lineage 2 família 41x). A detecção é feita pela
+/// presença do header <c>Lineage2Ver413</c>:
+///   - arquivo COM header  -> já está encryptado -> DECRYPT
+///   - arquivo SEM header   -> arquivo cru        -> ENCRYPT
 /// </summary>
 internal static class FileProcessor
 {
@@ -21,6 +27,10 @@ internal static class FileProcessor
     {
         ".dat", ".u", ".ukx", ".utx",
     };
+
+    // Motor Blowfish configurado com a chave própria do servidor.
+    private static readonly L2FileFormatBlowfish Format =
+        new(L2ServerKey.KeyBytes);
 
     public static bool IsSupported(string path)
     {
@@ -36,26 +46,20 @@ internal static class FileProcessor
     {
         byte[] input = File.ReadAllBytes(path);
 
-        bool currentlyUnlocked = CryptoEngine.IsUnlocked(input);
-        byte[] output = CryptoEngine.Transform(input);
-        bool outputUnlocked = CryptoEngine.IsUnlocked(output);
-
         CryptoAction action;
+        byte[] output;
 
-        if (currentlyUnlocked)
+        if (L2FileFormatBlowfish.HasHeader(input))
         {
-            // Arquivo original (Lineage2Ver413) -> vamos bloquear.
-            action = CryptoAction.Encrypt;
-        }
-        else if (outputUnlocked)
-        {
-            // Ao transformar, restaurou o header original -> estava encryptado.
+            // Já tem header 413 -> está encryptado -> decrypta.
+            output = Format.Decrypt(input);
             action = CryptoAction.Decrypt;
         }
         else
         {
-            throw new InvalidDataException(
-                "Arquivo nao reconhecido como Lineage2Ver413 original ou 413 encryptado.");
+            // Arquivo cru -> adiciona header e cifra o corpo.
+            output = Format.Encrypt(input);
+            action = CryptoAction.Encrypt;
         }
 
         WriteAtomic(path, output);
