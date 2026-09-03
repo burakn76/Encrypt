@@ -1,14 +1,23 @@
 using System;
+using JNukeCrypt.Blowfish;
 
 namespace JNukeCrypt;
 
 /// <summary>
-/// Fachada de compatibilidade para o launcher/cliente. Mantém a assinatura
-/// pública <c>Transform</c> usada anteriormente, mas delega para o
-/// <see cref="CryptoEngine"/> — assim as chaves ficam num único lugar
-/// (<see cref="CryptoKeys"/>) e os dois lados nunca divergem.
+/// Fachada de compatibilidade para o launcher/cliente. Aplica o mesmo esquema
+/// Blowfish (formato 41x) usado pelo encryptor. Use a MESMA chave dos dois
+/// lados (<see cref="L2ServerKey"/>).
+///
+/// - <see cref="DecryptFile"/>: recebe um arquivo com header 413 e devolve o
+///   corpo decifrado (o que o cliente precisa para ler o conteúdo original).
+/// - <see cref="EncryptFile"/>: recebe conteúdo cru e devolve o arquivo com
+///   header + corpo cifrado.
 /// </summary>
 internal static class JNukePrivate413Crypto
 {
-    public static byte[] Transform(ReadOnlySpan<byte> data) => CryptoEngine.Transform(data);
+    private static readonly L2FileFormatBlowfish Format = new(L2ServerKey.KeyBytes);
+
+    public static byte[] EncryptFile(ReadOnlySpan<byte> rawBody) => Format.Encrypt(rawBody);
+
+    public static byte[] DecryptFile(ReadOnlySpan<byte> file) => Format.Decrypt(file);
 }
