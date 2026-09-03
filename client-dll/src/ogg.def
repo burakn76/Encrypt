@@ -1,0 +1,49 @@
+; ogg.dll proxy - reexporta (forwarding) todas as funcoes da libogg original,
+; que deve estar renomeada como ogg_real.dll na pasta system/.
+; Assim o cliente L2 continua usando o audio normalmente, enquanto a nossa
+; DLL intercepta a leitura de arquivos para decriptar on-the-fly.
+LIBRARY ogg
+EXPORTS
+    ogg_packet_clear=ogg_real.ogg_packet_clear @1
+    ogg_page_bos=ogg_real.ogg_page_bos @2
+    ogg_page_continued=ogg_real.ogg_page_continued @3
+    ogg_page_eos=ogg_real.ogg_page_eos @4
+    ogg_page_granulepos=ogg_real.ogg_page_granulepos @5
+    ogg_page_packets=ogg_real.ogg_page_packets @6
+    ogg_page_pageno=ogg_real.ogg_page_pageno @7
+    ogg_page_serialno=ogg_real.ogg_page_serialno @8
+    ogg_page_version=ogg_real.ogg_page_version @9
+    ogg_stream_clear=ogg_real.ogg_stream_clear @10
+    ogg_stream_destroy=ogg_real.ogg_stream_destroy @11
+    ogg_stream_eos=ogg_real.ogg_stream_eos @12
+    ogg_stream_flush=ogg_real.ogg_stream_flush @13
+    ogg_stream_init=ogg_real.ogg_stream_init @14
+    ogg_stream_packetin=ogg_real.ogg_stream_packetin @15
+    ogg_stream_packetout=ogg_real.ogg_stream_packetout @16
+    ogg_stream_packetpeek=ogg_real.ogg_stream_packetpeek @17
+    ogg_stream_pagein=ogg_real.ogg_stream_pagein @18
+    ogg_stream_pageout=ogg_real.ogg_stream_pageout @19
+    ogg_stream_reset=ogg_real.ogg_stream_reset @20
+    ogg_stream_reset_serialno=ogg_real.ogg_stream_reset_serialno @21
+    ogg_sync_buffer=ogg_real.ogg_sync_buffer @22
+    ogg_sync_clear=ogg_real.ogg_sync_clear @23
+    ogg_sync_destroy=ogg_real.ogg_sync_destroy @24
+    ogg_sync_init=ogg_real.ogg_sync_init @25
+    ogg_sync_pageout=ogg_real.ogg_sync_pageout @26
+    ogg_sync_pageseek=ogg_real.ogg_sync_pageseek @27
+    ogg_sync_reset=ogg_real.ogg_sync_reset @28
+    ogg_sync_wrote=ogg_real.ogg_sync_wrote @29
+    oggpack_adv=ogg_real.oggpack_adv @30
+    oggpack_adv1=ogg_real.oggpack_adv1 @31
+    oggpack_bits=ogg_real.oggpack_bits @32
+    oggpack_bytes=ogg_real.oggpack_bytes @33
+    oggpack_get_buffer=ogg_real.oggpack_get_buffer @34
+    oggpack_look=ogg_real.oggpack_look @35
+    oggpack_look1=ogg_real.oggpack_look1 @36
+    oggpack_read=ogg_real.oggpack_read @37
+    oggpack_read1=ogg_real.oggpack_read1 @38
+    oggpack_readinit=ogg_real.oggpack_readinit @39
+    oggpack_reset=ogg_real.oggpack_reset @40
+    oggpack_write=ogg_real.oggpack_write @41
+    oggpack_writeclear=ogg_real.oggpack_writeclear @42
+    oggpack_writeinit=ogg_real.oggpack_writeinit @43
