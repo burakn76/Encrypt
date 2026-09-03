@@ -1,0 +1,8 @@
+# .NET build output
+bin/
+obj/
+*.user
+
+# DLLs de terceiros / binarios de saida
+*.dll
+client-dll/build/
